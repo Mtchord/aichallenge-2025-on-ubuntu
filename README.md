@@ -1,1 +1,0 @@
-# aichallenge-2025-on-ubuntu
