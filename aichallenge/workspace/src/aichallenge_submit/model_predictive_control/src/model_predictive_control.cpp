@@ -7,6 +7,48 @@
 
 #include <algorithm>
 
+#include <cppad/cppad.hpp>
+#include <cppad/ipopt/solve.hpp>
+
+using CppAD::AD;
+
+// Set the timestep length and duration
+//Predict unitl 10 time step ahead
+size_t N = 10;
+// Set dt to 0.1 since the latency is 0.1s(we have to predict at least 0.1s ahead)
+double dt = 0.1;
+
+const double Lf = 1.087; // distance between the front and rear axles of the vehicle
+//基準のCTE，角度差を0で初期化
+double ref_cte = 0;
+double ref_epsi = 0;
+//目標スピードを100.0MPHに設定
+double ref_v = 100.0;
+
+/*
+0~N-1まではxの値
+N~2N-1まではyの値
+2N~3N-1まではpsiの値
+3N~4N-1まではvの値
+4N~5N-1まではcte値
+5N~6N-1まではepsiの値
+6N~7N-1まではdeltaの値
+7N~8N-1まではaの値を保存
+*/
+size_t x_start = 0;
+size_t y_start = x_start + N;
+size_t psi_start = y_start + N;
+size_t v_start = psi_start + N;
+size_t cte_start = v_start + N;
+size_t epsi_start = cte_start + N;
+size_t delta_start = epsi_start + N;
+size_t a_start = delta_start + N - 1;
+
+
+
+
+
+
 namespace model_predictive_control
 {
 

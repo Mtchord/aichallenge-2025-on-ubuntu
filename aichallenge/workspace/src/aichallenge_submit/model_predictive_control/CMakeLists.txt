@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.8)
 project(model_predictive_control)
 
+include_directories(
+  /usr/include
+  /usr/local/include
+)
+
 find_package(autoware_cmake REQUIRED)
 autoware_package()
 
