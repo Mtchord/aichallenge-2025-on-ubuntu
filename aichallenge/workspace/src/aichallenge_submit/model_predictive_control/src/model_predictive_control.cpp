@@ -125,7 +125,24 @@ class FG_eval {
 };
 
 
+Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals, int order) {
+  assert(xvals.size() == yvals.size());
+  assert(order >= 1 && order <= xvals.size() - 1);
+  Eigen::MatrixXd A(xvals.size(), order + 1);
 
+  for (int i = 0; i < xvals.size(); i++) {
+    A(i, 0) = 1.0;
+  }
+
+  for (int j = 0; j < xvals.size(); j++) {
+    for (int i = 0; i < order; i++) {
+      A(j, i + 1) = A(j, i) * xvals(j);
+    }
+  }
+
+  auto Q = A.householderQr();
+  return Q.solve(yvals);
+}
 
 namespace model_predictive_control
 {
@@ -195,14 +212,145 @@ void ModelPredictiveControl::onTimer()
     // get closest trajectory point from current position
     TrajectoryPoint closet_traj_point = trajectory_->points.at(closet_traj_point_idx);
 
+    std::vector<double> ptsx, ptsy;
+    for (size_t i = 0; i < std::min<size_t>(6, trajectory_->points.size()); ++i) {
+      ptsx.push_back(trajectory_->points[i].pose.position.x);
+      ptsy.push_back(trajectory_->points[i].pose.position.y);
+    }
+
+    Eigen::VectorXd ptsx_eig = Eigen::Map<Eigen::VectorXd>(ptsx.data(), ptsx.size());
+    Eigen::VectorXd ptsy_eig = Eigen::Map<Eigen::VectorXd>(ptsy.data(), ptsy.size());
+
+    // generate coefficients using 3rd order polynomial
+    Eigen::VectorXd coeffs = polyfit(ptsx_eig, ptsy_eig, 3);
+
+
+    //モデル予測制御を解く
+    bool ok = true;
+    typedef CPPAD_TESTVECTOR(double) Dvector;
+
+
+    double x = odometry_->pose.pose.position.x;
+    double y = odometry_->pose.pose.position.y;
+    double psi = odometry_->pose.pose.orientation.z;
+    double vx = odometry_->twist.twist.linear.x;
+    double vy = odometry_->twist.twist.linear.y;
+    double v = std::hypot(vx, vy);
+    double xdist = closet_traj_point.pose.position.x - x;
+    double ydist = closet_traj_point.pose.position.y - y;
+    double cte = std::hypot(xdist, ydist);
+    double epsi = closet_traj_point.pose.orientation.z - psi;
+
+    size_t n_vars = 6 * N + 2 * (N-1);
+    // Set the number of constraints
+    size_t n_constraints = 6 * N;
+
+    // Initial value of the independent variables.
+    // SHOULD BE 0 besides initial state.
+    Dvector vars(n_vars);
+    for (size_t i = 0; i < n_vars; i++) {
+      vars[i] = 0.0;
+    }
+
+    vars[x_start] = x;
+    vars[y_start] = y;
+    vars[psi_start] = psi;
+    vars[v_start] = v;
+    vars[cte_start] = cte;
+    vars[epsi_start] = epsi;
+
+    Dvector vars_lowerbound(n_vars);
+    Dvector vars_upperbound(n_vars);
+    // Set lower and upper limits for variables.
+    for(size_t i = 0; i < delta_start; i++){
+      vars_lowerbound[i] = -1.0e19;
+      vars_upperbound[i] = 1.0e19;
+    }
+    //ハンドル角の制限
+    for(size_t i = delta_start; i < a_start; i++){
+      vars_lowerbound[i] = -0.436332;
+      vars_upperbound[i] = 0.436332;
+    }
+    //アクセル量の制限
+    for(size_t i = a_start; i < n_vars; i++){
+      vars_lowerbound[i] = -1.0;
+      vars_upperbound[i] = 1.0;
+    }
+
+    // Lower and upper limits for the constraints
+    // Should be 0 besides initial state.
+    Dvector constraints_lowerbound(n_constraints);
+    Dvector constraints_upperbound(n_constraints);
+    for (size_t i = 0; i < n_constraints; i++) {
+      constraints_lowerbound[i] = 0;
+      constraints_upperbound[i] = 0;
+    }
+
+    constraints_lowerbound[x_start] = x;
+    constraints_lowerbound[y_start] = y;
+    constraints_lowerbound[psi_start] = psi;
+    constraints_lowerbound[v_start] = v;
+    constraints_lowerbound[cte_start] = cte;
+    constraints_lowerbound[epsi_start] = epsi;
+
+    constraints_upperbound[x_start] = x;
+    constraints_upperbound[y_start] = y;
+    constraints_upperbound[psi_start] = psi;
+    constraints_upperbound[v_start] = v;
+    constraints_upperbound[cte_start] = cte;
+    constraints_upperbound[epsi_start] = epsi;
+
+
+    // object that computes objective and constraints
+    FG_eval fg_eval(coeffs);
+
+    
+    std::string options;
+    options += "Integer print_level  0\n";
+    
+    options += "Sparse  true        forward\n";
+    options += "Sparse  true        reverse\n";
+  
+    options += "Numeric max_cpu_time          0.5\n";
+
+    // place to return solution
+    CppAD::ipopt::solve_result<Dvector> solution;
+
+    // solve the problem
+    CppAD::ipopt::solve<Dvector, FG_eval>(
+        options, vars, vars_lowerbound, vars_upperbound, constraints_lowerbound,
+        constraints_upperbound, fg_eval, solution);
+
+    // Check some of the solution values
+    ok &= solution.status == CppAD::ipopt::solve_result<Dvector>::success;
+
+    // Cost
+    auto cost = solution.obj_value;
+    std::cout << "Cost " << cost << std::endl;
+
+    
+    //ハンドル量とアクセル量の最適解
+    cmd.longitudinal.acceleration = solution.x[a_start];
+    cmd.lateral.steering_tire_angle = solution.x[delta_start];
+    // result.push_back(solution.x[delta_start]);
+    // result.push_back(solution.x[a_start]);
+    // //10ステップ先までの予測軌道
+    // for(int i = 0; i < N-1; i++){
+    //   result.push_back(solution.x[x_start+i+1]);
+    //   result.push_back(solution.x[y_start+i+1]);
+    // }
+    // return result;
+
+
+    // 以下、もとのソースコード
     // calc longitudinal speed and acceleration
     double target_longitudinal_vel =
       use_external_target_vel_ ? external_target_vel_ : closet_traj_point.longitudinal_velocity_mps;
-    double current_longitudinal_vel = odometry_->twist.twist.linear.x;
+    // double current_longitudinal_vel = odometry_->twist.twist.linear.x;
 
     cmd.longitudinal.speed = target_longitudinal_vel;
-    cmd.longitudinal.acceleration =
-      speed_proportional_gain_ * (target_longitudinal_vel - current_longitudinal_vel);
+    // cmd.longitudinal.acceleration =
+    //   speed_proportional_gain_ * (target_longitudinal_vel - current_longitudinal_vel);
 
     // calc lateral control
     //// calc lookahead distance
@@ -234,10 +382,10 @@ void ModelPredictiveControl::onTimer()
     pub_lookahead_point_->publish(lookahead_point_msg);
 
     // calc steering angle for lateral control
-    double alpha = std::atan2(lookahead_point_y - rear_y, lookahead_point_x - rear_x) -
-                   tf2::getYaw(odometry_->pose.pose.orientation);
-    cmd.lateral.steering_tire_angle =
-      steering_tire_angle_gain_ * std::atan2(2.0 * wheel_base_ * std::sin(alpha), lookahead_distance);
+    // double alpha = std::atan2(lookahead_point_y - rear_y, lookahead_point_x - rear_x) -
+    //                tf2::getYaw(odometry_->pose.pose.orientation);
+    // cmd.lateral.steering_tire_angle =
+    //   steering_tire_angle_gain_ * std::atan2(2.0 * wheel_base_ * std::sin(alpha), lookahead_distance);
   }
   pub_cmd_->publish(cmd);
   cmd.lateral.steering_tire_angle /=  steering_tire_angle_gain_;

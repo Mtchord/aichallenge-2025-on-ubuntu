@@ -6,6 +6,12 @@ include_directories(
   /usr/local/include
 )
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(IPOPT REQUIRED ipopt)
+
+include_directories(${IPOPT_INCLUDE_DIRS})
+link_directories(${IPOPT_LIBRARY_DIRS})
+
 find_package(autoware_cmake REQUIRED)
 autoware_package()
 
@@ -16,6 +22,10 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_executable(model_predictive_control
   src/model_predictive_control.cpp
+)
+
+target_link_libraries(model_predictive_control
+  ipopt
 )
 
 ament_auto_package()
