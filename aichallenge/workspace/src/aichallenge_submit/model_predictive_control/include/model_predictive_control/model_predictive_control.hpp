@@ -10,6 +10,8 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
+#include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
+#include <tier4_vehicle_msgs/msg/actuation_command_stamped.hpp>
 
 namespace model_predictive_control {
 
@@ -20,14 +22,18 @@ using geometry_msgs::msg::Pose;
 using geometry_msgs::msg::PointStamped;
 using geometry_msgs::msg::Twist;
 using nav_msgs::msg::Odometry;
+using autoware_auto_vehicle_msgs::msg::VelocityReport;
+using tier4_vehicle_msgs::msg::ActuationCommandStamped;
 
 class ModelPredictiveControl : public rclcpp::Node {
  public:
   explicit ModelPredictiveControl();
   
   // subscribers
+  rclcpp::Subscription<ActuationCommandStamped>::SharedPtr sub_actuation_;
   rclcpp::Subscription<Odometry>::SharedPtr sub_kinematics_;
   rclcpp::Subscription<Trajectory>::SharedPtr sub_trajectory_;
+  rclcpp::Subscription<VelocityReport>::SharedPtr sub_velocity_;
   
   // publishers
   rclcpp::Publisher<AckermannControlCommand>::SharedPtr pub_cmd_;
@@ -40,6 +46,8 @@ class ModelPredictiveControl : public rclcpp::Node {
   // updated by subscribers
   Trajectory::SharedPtr trajectory_;
   Odometry::SharedPtr odometry_;
+  VelocityReport::ConstSharedPtr velocity_report_;
+  ActuationCommandStamped::SharedPtr actuation_cmd_;
 
 
 

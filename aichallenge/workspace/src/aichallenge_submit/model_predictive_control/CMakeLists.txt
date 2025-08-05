@@ -4,6 +4,7 @@ project(model_predictive_control)
 include_directories(
   /usr/include
   /usr/local/include
+  /usr/local/lib
 )
 
 find_package(PkgConfig REQUIRED)

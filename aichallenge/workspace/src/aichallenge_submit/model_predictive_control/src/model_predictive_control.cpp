@@ -10,6 +10,8 @@
 #include <cppad/cppad.hpp>
 #include <cppad/ipopt/solve.hpp>
 
+#include <Eigen/Dense>
+
 using CppAD::AD;
 
 // Set the timestep length and duration
@@ -23,7 +25,7 @@ const double Lf = 1.087; // distance between the front and rear axles of the veh
 double ref_cte = 0;
 double ref_epsi = 0;
 //目標スピードを100.0MPHに設定
-double ref_v = 100.0;
+double ref_v = 20.0;
 
 /*
 0~N-1まではxの値
@@ -61,8 +63,8 @@ class FG_eval {
     fg[0] = 0;
 
     for (size_t i = 0; i < N - 1; i++) {
-      fg[0] += 2000 * CppAD::pow(vars[cte_start + i] - ref_cte, 2);
-      fg[0] += 1800 * CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
+      fg[0] += 0.001 * CppAD::pow(vars[cte_start + i] - ref_cte, 2);
+      fg[0] += 0.001 * CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
       fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
     }
 
@@ -73,8 +75,8 @@ class FG_eval {
 
     // Minimize the value gap between sequential actuations.
     for (size_t i = 0; i < N - 2; i++) {
-      fg[0] += 100 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
-      fg[0] += 10 * CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
+      fg[0] += 1 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
+      fg[0] += 1 * CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
     }
 
     //Setup constraints
@@ -144,6 +146,14 @@ Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals, int order)
   return Q.solve(yvals);
 }
 
+double polyeval(Eigen::VectorXd coeffs, double x) {
+  double result = 0.0;
+  for (int i = 0; i < coeffs.size(); i++) {
+    result += coeffs[i] * pow(x, i);
+  }
+  return result;
+}
+
 namespace model_predictive_control
 {
 
@@ -171,6 +181,8 @@ ModelPredictiveControl::ModelPredictiveControl()
     "input/kinematics", bv_qos, [this](const Odometry::SharedPtr msg) { odometry_ = msg; });
   sub_trajectory_ = create_subscription<Trajectory>(
     "input/trajectory", bv_qos, [this](const Trajectory::SharedPtr msg) { trajectory_ = msg; });
+  sub_actuation_ = create_subscription<ActuationCommandStamped>(
+  "/control/command/actuation_cmd", bv_qos, [this](const ActuationCommandStamped::SharedPtr msg) { actuation_cmd_ = msg; });
 
   using namespace std::literals::chrono_literals;
   timer_ =
@@ -209,13 +221,19 @@ void ModelPredictiveControl::onTimer()
     cmd.longitudinal.acceleration = -10.0;
     RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 1000 /*ms*/, "reached to the goal");
   } else {
+    double px = odometry_->pose.pose.position.x;
+    double py = odometry_->pose.pose.position.y;
+    double psi_prev = tf2::getYaw(odometry_->pose.pose.orientation);
+
     // get closest trajectory point from current position
     TrajectoryPoint closet_traj_point = trajectory_->points.at(closet_traj_point_idx);
 
     std::vector<double> ptsx, ptsy;
     for (size_t i = 0; i < std::min<size_t>(6, trajectory_->points.size()); ++i) {
-      ptsx.push_back(trajectory_->points[i].pose.position.x);
-      ptsy.push_back(trajectory_->points[i].pose.position.y);
+      double dx = trajectory_->points[i].pose.position.x - px;
+      double dy = trajectory_->points[i].pose.position.y - py;
+      ptsx.push_back(dx * cos(-psi_prev) - dy * sin(-psi_prev));
+      ptsy.push_back(dx * sin(-psi_prev) + dy * cos(-psi_prev));
     }
 
     Eigen::VectorXd ptsx_eig = Eigen::Map<Eigen::VectorXd>(ptsx.data(), ptsx.size());
@@ -224,22 +242,40 @@ void ModelPredictiveControl::onTimer()
     // generate coefficients using 3rd order polynomial
     Eigen::VectorXd coeffs = polyfit(ptsx_eig, ptsy_eig, 3);
 
+    // double cte_prev = polyeval(coeffs, 0.0);
+    // double epsi_prev = -atan(coeffs[1]);
+
 
     //モデル予測制御を解く
     bool ok = true;
     typedef CPPAD_TESTVECTOR(double) Dvector;
 
-
-    double x = odometry_->pose.pose.position.x;
-    double y = odometry_->pose.pose.position.y;
-    double psi = odometry_->pose.pose.orientation.z;
+    double psi = tf2::getYaw(odometry_->pose.pose.orientation);
+    double x = px * cos(psi) + py * sin(psi);
+    double y = -px * sin(psi) + py * cos(psi);
     double vx = odometry_->twist.twist.linear.x;
     double vy = odometry_->twist.twist.linear.y;
     double v = std::hypot(vx, vy);
-    double xdist = closet_traj_point.pose.position.x - x;
-    double ydist = closet_traj_point.pose.position.y - y;
-    double cte = std::hypot(xdist, ydist);
-    double epsi = closet_traj_point.pose.orientation.z - psi;
+
+    double f = coeffs[0] + coeffs[1]*x + coeffs[2]*x*x + coeffs[3]*x*x*x;
+    double psides = atan(coeffs[1] + 2*coeffs[2]*x + 3*coeffs[3]*x*x);
+
+    double cte = f - y;
+    double epsi = psi - psides;
+
+
+    // double vx = odometry_->twist.twist.linear.x;
+    // double vy = odometry_->twist.twist.linear.y;
+    // double v_prev = std::hypot(vx, vy);
+    // double x = v_prev * dt;
+    // double y = 0.0; 
+    // double psi = -v_prev * actuation_cmd_->actuation.steer_cmd / Lf * dt;
+    // double v = v_prev + actuation_cmd_->actuation.accel_cmd * dt;
+    // double cte = cte_prev + v_prev * sin(epsi_prev) * dt;
+    // double epsi = epsi_prev - v_prev * actuation_cmd_->actuation.steer_cmd / Lf * dt;
+
+    // RCLCPP_INFO(get_logger(), "x: %f, y: %f, psi: %f, v: %f, cte: %f, epsi: %f, steer: %f, accel: %f",
+    //             x, y, psi, v, cte, epsi, actuation_cmd_->actuation.steer_cmd, actuation_cmd_->actuation.accel_cmd);
 
     size_t n_vars = 6 * N + 2 * (N-1);
     // Set the number of constraints
@@ -268,11 +304,15 @@ void ModelPredictiveControl::onTimer()
     }
     //ハンドル角の制限
     for(size_t i = delta_start; i < a_start; i++){
-      vars_lowerbound[i] = -0.436332;
-      vars_upperbound[i] = 0.436332;
+      // vars_lowerbound[i] = -0.436332;
+      // vars_upperbound[i] = 0.436332;
+      vars_lowerbound[i] = -10;
+      vars_upperbound[i] = 10;
     }
     //アクセル量の制限
     for(size_t i = a_start; i < n_vars; i++){
+      // vars_lowerbound[i] = -1.0;
+      // vars_upperbound[i] = 1.0;
       vars_lowerbound[i] = -1.0;
       vars_upperbound[i] = 1.0;
     }
@@ -306,12 +346,12 @@ void ModelPredictiveControl::onTimer()
 
     
     std::string options;
-    options += "Integer print_level  0\n";
+    options += "Integer print_level  5\n";
     
     options += "Sparse  true        forward\n";
     options += "Sparse  true        reverse\n";
   
-    options += "Numeric max_cpu_time          0.5\n";
+    options += "Numeric max_cpu_time          2\n";
 
     // place to return solution
     CppAD::ipopt::solve_result<Dvector> solution;
@@ -323,15 +363,54 @@ void ModelPredictiveControl::onTimer()
 
     // Check some of the solution values
     ok &= solution.status == CppAD::ipopt::solve_result<Dvector>::success;
+    std::cout << "Solver status: " << solution.status << std::endl;
 
     // Cost
     auto cost = solution.obj_value;
     std::cout << "Cost " << cost << std::endl;
 
+
+    if (!ok) {
+      const char *status_str = "";
+      switch (solution.status) {
+        case CppAD::ipopt::solve_result<Dvector>::success:
+          status_str = "success";
+          break;
+        case CppAD::ipopt::solve_result<Dvector>::maxiter_exceeded:
+          status_str = "maxiter_exceeded";
+          break;
+        case CppAD::ipopt::solve_result<Dvector>::stop_at_tiny_step:
+          status_str = "stop_at_tiny_step";
+          break;
+        case CppAD::ipopt::solve_result<Dvector>::local_infeasibility:
+          status_str = "local_infeasibility";
+          break;
+        case CppAD::ipopt::solve_result<Dvector>::user_requested_stop:
+          status_str = "user_requested_stop";
+          break;
+        case CppAD::ipopt::solve_result<Dvector>::feasible_point_found:
+          status_str = "feasible_point_found";
+          break;
+        case CppAD::ipopt::solve_result<Dvector>::not_defined:
+          status_str = "not_defined";
+          break;
+        default:
+          status_str = "unknown";
+          break;
+      }
+
+      RCLCPP_ERROR(get_logger(), "MPC solve failed: status = %s (%d)", status_str, static_cast<int>(solution.status));
+      pub_cmd_->publish(cmd);
+      return;
+    }
     
     //ハンドル量とアクセル量の最適解
     cmd.longitudinal.acceleration = solution.x[a_start];
     cmd.lateral.steering_tire_angle = solution.x[delta_start];
+    // cmd.longitudinal.acceleration = 0.4;
+    // cmd.lateral.steering_tire_angle = 0.4;
+
+    
     // result.push_back(solution.x[delta_start]);
     // result.push_back(solution.x[a_start]);
     // //10ステップ先までの予測軌道
@@ -348,7 +427,7 @@ void ModelPredictiveControl::onTimer()
       use_external_target_vel_ ? external_target_vel_ : closet_traj_point.longitudinal_velocity_mps;
     // double current_longitudinal_vel = odometry_->twist.twist.linear.x;
 
-    cmd.longitudinal.speed = target_longitudinal_vel;
+    // cmd.longitudinal.speed = target_longitudinal_vel;
     // cmd.longitudinal.acceleration =
     //   speed_proportional_gain_ * (target_longitudinal_vel - current_longitudinal_vel);
 
