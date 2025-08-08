@@ -25,7 +25,7 @@ const double Lf = 1.087; // distance between the front and rear axles of the veh
 double ref_cte = 0;
 double ref_epsi = 0;
 //目標スピードを100.0MPHに設定
-double ref_v = 20.0;
+double ref_v = 15.0;
 
 /*
 0~N-1まではxの値
@@ -63,14 +63,14 @@ class FG_eval {
     fg[0] = 0;
 
     for (size_t i = 0; i < N - 1; i++) {
-      fg[0] += 0.001 * CppAD::pow(vars[cte_start + i] - ref_cte, 2);
-      fg[0] += 0.001 * CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
+      fg[0] += 0.01 * CppAD::pow(vars[cte_start + i] - ref_cte, 2);
+      fg[0] += 1 * CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
       fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
     }
 
     for (size_t i = 0; i < N - 1; i++) {
-      fg[0] += 3 * CppAD::pow(vars[delta_start + i], 2);
-      fg[0] += 5 * CppAD::pow(vars[a_start + i], 2);
+      fg[0] += 2000 * CppAD::pow(vars[delta_start + i], 2);
+      fg[0] += 1 * CppAD::pow(vars[a_start + i], 2);
     }
 
     // Minimize the value gap between sequential actuations.
@@ -181,8 +181,10 @@ ModelPredictiveControl::ModelPredictiveControl()
     "input/kinematics", bv_qos, [this](const Odometry::SharedPtr msg) { odometry_ = msg; });
   sub_trajectory_ = create_subscription<Trajectory>(
     "input/trajectory", bv_qos, [this](const Trajectory::SharedPtr msg) { trajectory_ = msg; });
-  sub_actuation_ = create_subscription<ActuationCommandStamped>(
-  "/control/command/actuation_cmd", bv_qos, [this](const ActuationCommandStamped::SharedPtr msg) { actuation_cmd_ = msg; });
+  sub_steering_ = create_subscription<SteeringReport>(
+  "/vehicle/status/steering_status", bv_qos, [this](const SteeringReport::SharedPtr msg) { steering_ = msg; });
+  sub_acceleration_ = create_subscription<Imu>(
+    "/sensing/imu/imu_raw", bv_qos, [this](const Imu::SharedPtr msg) { acceleration_ = msg; });
 
   using namespace std::literals::chrono_literals;
   timer_ =
@@ -242,40 +244,44 @@ void ModelPredictiveControl::onTimer()
     // generate coefficients using 3rd order polynomial
     Eigen::VectorXd coeffs = polyfit(ptsx_eig, ptsy_eig, 3);
 
-    // double cte_prev = polyeval(coeffs, 0.0);
-    // double epsi_prev = -atan(coeffs[1]);
+    double cte_prev = polyeval(coeffs, 0.0);
+    double epsi_prev = -atan(coeffs[1]);
 
 
     //モデル予測制御を解く
     bool ok = true;
     typedef CPPAD_TESTVECTOR(double) Dvector;
 
-    double psi = tf2::getYaw(odometry_->pose.pose.orientation);
-    double x = px * cos(psi) + py * sin(psi);
-    double y = -px * sin(psi) + py * cos(psi);
-    double vx = odometry_->twist.twist.linear.x;
-    double vy = odometry_->twist.twist.linear.y;
-    double v = std::hypot(vx, vy);
-
-    double f = coeffs[0] + coeffs[1]*x + coeffs[2]*x*x + coeffs[3]*x*x*x;
-    double psides = atan(coeffs[1] + 2*coeffs[2]*x + 3*coeffs[3]*x*x);
-
-    double cte = f - y;
-    double epsi = psi - psides;
-
-
+    // double psi = tf2::getYaw(odometry_->pose.pose.orientation);
+    // double x = px * cos(psi) + py * sin(psi);
+    // double y = -px * sin(psi) + py * cos(psi);
     // double vx = odometry_->twist.twist.linear.x;
     // double vy = odometry_->twist.twist.linear.y;
-    // double v_prev = std::hypot(vx, vy);
-    // double x = v_prev * dt;
-    // double y = 0.0; 
-    // double psi = -v_prev * actuation_cmd_->actuation.steer_cmd / Lf * dt;
-    // double v = v_prev + actuation_cmd_->actuation.accel_cmd * dt;
-    // double cte = cte_prev + v_prev * sin(epsi_prev) * dt;
-    // double epsi = epsi_prev - v_prev * actuation_cmd_->actuation.steer_cmd / Lf * dt;
+    // double v = std::hypot(vx, vy);
 
-    // RCLCPP_INFO(get_logger(), "x: %f, y: %f, psi: %f, v: %f, cte: %f, epsi: %f, steer: %f, accel: %f",
-    //             x, y, psi, v, cte, epsi, actuation_cmd_->actuation.steer_cmd, actuation_cmd_->actuation.accel_cmd);
+    // double f = coeffs[0] + coeffs[1]*x + coeffs[2]*x*x + coeffs[3]*x*x*x;
+    // double psides = atan(coeffs[1] + 2*coeffs[2]*x + 3*coeffs[3]*x*x);
+
+    // double cte = f - y;
+    // double epsi = psi - psides;
+
+
+    double vx = odometry_->twist.twist.linear.x;
+    double vy = odometry_->twist.twist.linear.y;
+    double v_prev = std::hypot(vx, vy);
+    double accelx = acceleration_->linear_acceleration.x;
+    double accely = acceleration_->linear_acceleration.y;
+    double accel = std::hypot(accelx, accely);
+    double steering_angle = steering_->steering_tire_angle;
+    double x = v_prev * dt;
+    double y = 0.0; 
+    double psi = -v_prev * steering_angle / Lf * dt;
+    double v = v_prev + accel * dt;
+    double cte = cte_prev + v_prev * sin(epsi_prev) * dt;
+    double epsi = epsi_prev - v_prev * steering_angle / Lf * dt;
+
+    RCLCPP_INFO(get_logger(), "x: %f, y: %f, psi: %f, v: %f, cte: %f, epsi: %f, steer: %f, accel: %f",
+                x, y, psi, v, cte, epsi, steering_->steering_tire_angle, acceleration_->linear_acceleration.x);
 
     size_t n_vars = 6 * N + 2 * (N-1);
     // Set the number of constraints
@@ -306,8 +312,8 @@ void ModelPredictiveControl::onTimer()
     for(size_t i = delta_start; i < a_start; i++){
       // vars_lowerbound[i] = -0.436332;
       // vars_upperbound[i] = 0.436332;
-      vars_lowerbound[i] = -10;
-      vars_upperbound[i] = 10;
+      vars_lowerbound[i] = -0.436332; // -25 degrees
+      vars_upperbound[i] = 0.436332; // 25 degrees
     }
     //アクセル量の制限
     for(size_t i = a_start; i < n_vars; i++){

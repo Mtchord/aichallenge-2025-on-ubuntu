@@ -11,6 +11,8 @@
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
+#include <sensor_msgs/msg/imu.hpp>
 #include <tier4_vehicle_msgs/msg/actuation_command_stamped.hpp>
 
 namespace model_predictive_control {
@@ -23,6 +25,8 @@ using geometry_msgs::msg::PointStamped;
 using geometry_msgs::msg::Twist;
 using nav_msgs::msg::Odometry;
 using autoware_auto_vehicle_msgs::msg::VelocityReport;
+using autoware_auto_vehicle_msgs::msg::SteeringReport;
+using sensor_msgs::msg::Imu;
 using tier4_vehicle_msgs::msg::ActuationCommandStamped;
 
 class ModelPredictiveControl : public rclcpp::Node {
@@ -34,6 +38,8 @@ class ModelPredictiveControl : public rclcpp::Node {
   rclcpp::Subscription<Odometry>::SharedPtr sub_kinematics_;
   rclcpp::Subscription<Trajectory>::SharedPtr sub_trajectory_;
   rclcpp::Subscription<VelocityReport>::SharedPtr sub_velocity_;
+  rclcpp::Subscription<SteeringReport>::SharedPtr sub_steering_;
+  rclcpp::Subscription<Imu>::SharedPtr sub_acceleration_;
   
   // publishers
   rclcpp::Publisher<AckermannControlCommand>::SharedPtr pub_cmd_;
@@ -47,6 +53,8 @@ class ModelPredictiveControl : public rclcpp::Node {
   Trajectory::SharedPtr trajectory_;
   Odometry::SharedPtr odometry_;
   VelocityReport::ConstSharedPtr velocity_report_;
+  SteeringReport::SharedPtr steering_;
+  Imu::SharedPtr acceleration_;
   ActuationCommandStamped::SharedPtr actuation_cmd_;
 
 
