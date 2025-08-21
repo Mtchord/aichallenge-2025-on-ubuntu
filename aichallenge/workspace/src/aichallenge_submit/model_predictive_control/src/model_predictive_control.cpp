@@ -20,7 +20,7 @@ size_t N = 10;
 // Set dt to 0.1 since the latency is 0.1s(we have to predict at least 0.1s ahead)
 double dt = 0.1;
 
-const double Lf = 1.087; // distance between the front and rear axles of the vehicle
+const double Lf = 1.032; // distance between the front and rear axles of the vehicle
 //基準のCTE，角度差を0で初期化
 double ref_cte = 0;
 double ref_epsi = 0;
@@ -63,20 +63,20 @@ class FG_eval {
     fg[0] = 0;
 
     for (size_t i = 0; i < N - 1; i++) {
-      fg[0] += 0.01 * CppAD::pow(vars[cte_start + i] - ref_cte, 2);
-      fg[0] += 1 * CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
-      fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
+      fg[0] += 500 * CppAD::pow(vars[cte_start + i] - ref_cte, 2);
+      fg[0] += 700 * CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
+      fg[0] += 100 * CppAD::pow(vars[v_start + i] - ref_v, 2);
     }
 
     for (size_t i = 0; i < N - 1; i++) {
-      fg[0] += 2000 * CppAD::pow(vars[delta_start + i], 2);
-      fg[0] += 1 * CppAD::pow(vars[a_start + i], 2);
+      fg[0] += 50000 * CppAD::pow(vars[delta_start + i], 2);
+      fg[0] += 0.1 * CppAD::pow(vars[a_start + i], 2);
     }
 
     // Minimize the value gap between sequential actuations.
     for (size_t i = 0; i < N - 2; i++) {
-      fg[0] += 1 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
-      fg[0] += 1 * CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
+      fg[0] += 50 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
+      fg[0] += 10 * CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
     }
 
     //Setup constraints
@@ -116,10 +116,10 @@ class FG_eval {
       fg[2 + x_start + i] = x1 - (x0 + v0 * CppAD::cos(psi0) * dt);
       fg[2 + y_start + i] = y1 - (y0 + v0 * CppAD::sin(psi0) * dt);
 
-      fg[2 + psi_start + i] = psi1 - (psi0 - v0 * delta0 / Lf * dt);
+      fg[2 + psi_start + i] = psi1 - (psi0 + v0 * delta0 / Lf * dt);
       fg[2 + v_start + i] = v1 - (v0 + a0 * dt);
       fg[2 + cte_start + i] = cte1 - ((f0 - y0) + (v0 * CppAD::sin(epsi0) * dt));
-      fg[2 + epsi_start + i] = epsi1 - ((psi0 - psides0) - v0 * delta0 / Lf * dt);
+      fg[2 + epsi_start + i] = epsi1 - ((psi0 - psides0) + v0 * delta0 / Lf * dt);
 
     }
 
@@ -231,12 +231,24 @@ void ModelPredictiveControl::onTimer()
     TrajectoryPoint closet_traj_point = trajectory_->points.at(closet_traj_point_idx);
 
     std::vector<double> ptsx, ptsy;
-    for (size_t i = 0; i < std::min<size_t>(6, trajectory_->points.size()); ++i) {
-      double dx = trajectory_->points[i].pose.position.x - px;
-      double dy = trajectory_->points[i].pose.position.y - py;
-      ptsx.push_back(dx * cos(-psi_prev) - dy * sin(-psi_prev));
-      ptsy.push_back(dx * sin(-psi_prev) + dy * cos(-psi_prev));
+    for (size_t k = 0; k < 6; k++) {
+      size_t idx = closet_traj_point_idx + k;
+      if (idx >= trajectory_->points.size()) {
+        idx -= trajectory_->points.size(); 
+      }
+
+      double dx = trajectory_->points[idx].pose.position.x - px;
+      double dy = trajectory_->points[idx].pose.position.y - py;
+      ptsx.push_back(dx*cos(-psi_prev) - dy*sin(-psi_prev));
+      ptsy.push_back(dx*sin(-psi_prev) + dy*cos(-psi_prev));
     }
+
+    // for (size_t i = 0; i < std::min<size_t>(6, trajectory_->points.size()); ++i) {
+    //   double dx = trajectory_->points[i].pose.position.x - px;
+    //   double dy = trajectory_->points[i].pose.position.y - py;
+    //   ptsx.push_back(dx * cos(-psi_prev) - dy * sin(-psi_prev));
+    //   ptsy.push_back(dx * sin(-psi_prev) + dy * cos(-psi_prev));
+    // }
 
     Eigen::VectorXd ptsx_eig = Eigen::Map<Eigen::VectorXd>(ptsx.data(), ptsx.size());
     Eigen::VectorXd ptsy_eig = Eigen::Map<Eigen::VectorXd>(ptsy.data(), ptsy.size());
@@ -269,19 +281,20 @@ void ModelPredictiveControl::onTimer()
     double vx = odometry_->twist.twist.linear.x;
     double vy = odometry_->twist.twist.linear.y;
     double v_prev = std::hypot(vx, vy);
-    double accelx = acceleration_->linear_acceleration.x;
-    double accely = acceleration_->linear_acceleration.y;
-    double accel = std::hypot(accelx, accely);
-    double steering_angle = steering_->steering_tire_angle;
-    double x = v_prev * dt;
+    // double accelx = acceleration_->linear_acceleration.x;
+    // double accely = acceleration_->linear_acceleration.y;
+    // double accel = std::hypot(accelx, accely);
+    // double accel = acceleration_->linear_acceleration.x;
+    // double steering_angle = steering_->steering_tire_angle;
+    double x = 0.0;
     double y = 0.0; 
-    double psi = -v_prev * steering_angle / Lf * dt;
-    double v = v_prev + accel * dt;
-    double cte = cte_prev + v_prev * sin(epsi_prev) * dt;
-    double epsi = epsi_prev - v_prev * steering_angle / Lf * dt;
+    double psi = 0.0;
+    double v = v_prev;
+    double cte = cte_prev;
+    double epsi = epsi_prev;
 
-    RCLCPP_INFO(get_logger(), "x: %f, y: %f, psi: %f, v: %f, cte: %f, epsi: %f, steer: %f, accel: %f",
-                x, y, psi, v, cte, epsi, steering_->steering_tire_angle, acceleration_->linear_acceleration.x);
+    RCLCPP_INFO(get_logger(), "x: %f, y: %f, psi: %f, v: %f, cte: %f, epsi: %f, steer: %f, accel: %f, idx: %zu",
+                x, y, psi, v, cte, epsi, steering_->steering_tire_angle, acceleration_->linear_acceleration.x, closet_traj_point_idx);
 
     size_t n_vars = 6 * N + 2 * (N-1);
     // Set the number of constraints
@@ -319,8 +332,8 @@ void ModelPredictiveControl::onTimer()
     for(size_t i = a_start; i < n_vars; i++){
       // vars_lowerbound[i] = -1.0;
       // vars_upperbound[i] = 1.0;
-      vars_lowerbound[i] = -1.0;
-      vars_upperbound[i] = 1.0;
+      vars_lowerbound[i] = -2.5;
+      vars_upperbound[i] = 2.5;
     }
 
     // Lower and upper limits for the constraints
@@ -413,8 +426,8 @@ void ModelPredictiveControl::onTimer()
     //ハンドル量とアクセル量の最適解
     cmd.longitudinal.acceleration = solution.x[a_start];
     cmd.lateral.steering_tire_angle = solution.x[delta_start];
-    // cmd.longitudinal.acceleration = 0.4;
-    // cmd.lateral.steering_tire_angle = 0.4;
+    RCLCPP_INFO(get_logger(), "mpc accel: %f, steer: %f",
+                cmd.longitudinal.acceleration, cmd.lateral.steering_tire_angle);
 
     
     // result.push_back(solution.x[delta_start]);
@@ -473,7 +486,7 @@ void ModelPredictiveControl::onTimer()
     //   steering_tire_angle_gain_ * std::atan2(2.0 * wheel_base_ * std::sin(alpha), lookahead_distance);
   }
   pub_cmd_->publish(cmd);
-  cmd.lateral.steering_tire_angle /=  steering_tire_angle_gain_;
+  // cmd.lateral.steering_tire_angle /=  steering_tire_angle_gain_;
   pub_raw_cmd_->publish(cmd);
 }
 
