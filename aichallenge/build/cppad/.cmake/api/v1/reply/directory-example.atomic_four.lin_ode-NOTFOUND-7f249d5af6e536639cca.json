@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "example/atomic_four/lin_ode",
+		"source" : "example/atomic_four/lin_ode"
+	}
+}

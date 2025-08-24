@@ -1,0 +1,81 @@
+{
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"ADD_CUSTOM_TARGET",
+			"add_check_executable"
+		],
+		"files" : 
+		[
+			"cmake/add_check_executable.cmake",
+			"test_more/cppad_for_tmb/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 41,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 75,
+				"parent" : 1
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "test_more_cppad_for_tmb::@0a735f1264162c793de5"
+		}
+	],
+	"id" : "check_test_more_cppad_for_tmb::@0a735f1264162c793de5",
+	"name" : "check_test_more_cppad_for_tmb",
+	"paths" : 
+	{
+		"build" : "test_more/cppad_for_tmb",
+		"source" : "test_more/cppad_for_tmb"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/test_more/cppad_for_tmb/CMakeFiles/check_test_more_cppad_for_tmb",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/test_more/cppad_for_tmb/CMakeFiles/check_test_more_cppad_for_tmb.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

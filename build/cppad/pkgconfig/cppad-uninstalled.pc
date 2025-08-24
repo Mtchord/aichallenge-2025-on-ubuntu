@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
+# SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
+# SPDX-FileContributor: 2003-22 Bradley M. Bell
+# ----------------------------------------------------------------------------
+# The settings in this file file are the same as in cppad.pc except for the
+# following line:
+# includedir=/home/genki-yamamoto/aichallenge-2025/aichallenge/workspace/src/aichallenge_submit/CppAD/include
+#
+prefix=/home/genki-yamamoto/aichallenge-2025/install/cppad
+exec_prefix=${prefix}
+includedir=/home/genki-yamamoto/aichallenge-2025/aichallenge/workspace/src/aichallenge_submit/CppAD/include
+libdir=${exec_prefix}/lib
+#
+Name:                  cppad
+Description:           Differentiation of C++ Algorithms
+Version:               20250623
+URL:                   https://coin-or.github.io/CppAD
+#
+Cflags:                -I${includedir}
+Libs:                  -L/home/genki-yamamoto/aichallenge-2025/install/cppad/lib -lcppad_lib
+Requires:              
+Libs.private           
+Requires.private:      

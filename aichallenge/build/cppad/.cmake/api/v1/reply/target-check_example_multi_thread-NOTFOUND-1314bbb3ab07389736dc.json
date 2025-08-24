@@ -1,0 +1,78 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"ADD_CUSTOM_TARGET"
+		],
+		"files" : 
+		[
+			"example/multi_thread/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 73,
+				"parent" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"id" : "check_example_multi_thread_openmp::@2078378af7d053974048"
+		},
+		{
+			"id" : "check_example_multi_thread_sthread::@cda34dd102db3b7404a4"
+		},
+		{
+			"id" : "check_example_multi_thread_bthread::@abe6b0465c6e3290b229"
+		}
+	],
+	"id" : "check_example_multi_thread::@c056abbd9d4e3d9ba134",
+	"name" : "check_example_multi_thread",
+	"paths" : 
+	{
+		"build" : "example/multi_thread",
+		"source" : "example/multi_thread"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/example/multi_thread/CMakeFiles/check_example_multi_thread",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/example/multi_thread/CMakeFiles/check_example_multi_thread.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

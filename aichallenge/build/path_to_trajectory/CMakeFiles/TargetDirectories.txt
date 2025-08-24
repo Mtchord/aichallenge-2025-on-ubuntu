@@ -1,0 +1,10 @@
+/aichallenge/build/path_to_trajectory/CMakeFiles/uninstall.dir
+/aichallenge/build/path_to_trajectory/CMakeFiles/path_to_trajectory_uninstall.dir
+/aichallenge/build/path_to_trajectory/CMakeFiles/path_to_trajectory_node.dir
+/aichallenge/build/path_to_trajectory/CMakeFiles/test.dir
+/aichallenge/build/path_to_trajectory/CMakeFiles/edit_cache.dir
+/aichallenge/build/path_to_trajectory/CMakeFiles/rebuild_cache.dir
+/aichallenge/build/path_to_trajectory/CMakeFiles/list_install_components.dir
+/aichallenge/build/path_to_trajectory/CMakeFiles/install.dir
+/aichallenge/build/path_to_trajectory/CMakeFiles/install/local.dir
+/aichallenge/build/path_to_trajectory/CMakeFiles/install/strip.dir

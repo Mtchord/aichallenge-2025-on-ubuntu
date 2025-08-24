@@ -43,30 +43,6 @@ COPY submit/aichallenge_submit.tar.gz /ws
 RUN tar zxf /ws/aichallenge_submit.tar.gz -C /aichallenge/workspace/src
 RUN rm -rf /ws
 
-# --- IPOPT → CppAD → HSL ビルド ---
-COPY /aichallenge/ThirdParty-HSL/ /aichallenge/ThirdParty-HSL/
-RUN cd ~ && \
-    git clone https://github.com/coin-or/Ipopt.git && \
-    cd Ipopt && \
-    sudo ./configure && \
-    sudo make && \
-    sudo make install && \
-    sudo ldconfig && \
-    # CppAD インストール
-    sudo apt-get install -y cppad && \
-    # HSL ビルド
-    cd /aichallenge/ThirdParty-HSL && \
-    sudo ./configure --prefix=/usr/local/coinhsl && \
-    sudo make && \                                                   
-    sudo make install && \                                      
-    cd /usr/local/coinhsl/lib && \   
-    sudo ln -s libcoinhsl.so libhsl.so && \
-    sudo ldconfig && \
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/coinhsl/lib
-
-
-# ENV LD_LIBRARY_PATH=/usr/local/coinhsl/lib:$LD_LIBRARY_PATH
-
 RUN bash -c ' \
   source /autoware/install/setup.bash; \
   cd /aichallenge/workspace; \

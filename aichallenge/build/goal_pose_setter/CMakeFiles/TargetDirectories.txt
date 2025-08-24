@@ -1,0 +1,10 @@
+/aichallenge/build/goal_pose_setter/CMakeFiles/uninstall.dir
+/aichallenge/build/goal_pose_setter/CMakeFiles/goal_pose_setter_uninstall.dir
+/aichallenge/build/goal_pose_setter/CMakeFiles/goal_pose_setter_node.dir
+/aichallenge/build/goal_pose_setter/CMakeFiles/test.dir
+/aichallenge/build/goal_pose_setter/CMakeFiles/edit_cache.dir
+/aichallenge/build/goal_pose_setter/CMakeFiles/rebuild_cache.dir
+/aichallenge/build/goal_pose_setter/CMakeFiles/list_install_components.dir
+/aichallenge/build/goal_pose_setter/CMakeFiles/install.dir
+/aichallenge/build/goal_pose_setter/CMakeFiles/install/local.dir
+/aichallenge/build/goal_pose_setter/CMakeFiles/install/strip.dir

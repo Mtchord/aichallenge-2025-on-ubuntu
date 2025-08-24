@@ -1,0 +1,52 @@
+[0.373s] WARNING:colcon.colcon_core.package_selection:Some selected packages are already built in one or more underlay workspaces:
+	'gyro_odometer' is in: /autoware/install/gyro_odometer
+If a package in a merged underlay workspace is overridden and it installs headers, then all packages in the overlay must sort their include directories by workspace order. Failure to do so may result in build failures or undefined behavior at run time.
+If the overridden package is used by another package in any underlay, then the overriding package in the overlay must be API and ABI compatible or undefined behavior at run time may occur.
+
+If you understand the risks and want to override a package anyways, add the following to the command line:
+	--allow-overriding gyro_odometer
+
+This may be promoted to an error in a future release of colcon-override-check.
+Starting >>> goal_pose_setter
+Starting >>> gyro_odometer
+Starting >>> imu_corrector
+Starting >>> imu_gnss_poser
+Starting >>> path_to_trajectory
+Starting >>> racing_kart_description
+Starting >>> racing_kart_sensor_kit_description
+Starting >>> simple_pure_pursuit
+Starting >>> aichallenge_awsim_adapter
+Starting >>> autoware_overlay_rviz_plugin
+Starting >>> cppad
+Starting >>> model_predictive_control
+Starting >>> racing_kart_gnss_poser
+Starting >>> simple_trajectory_generator
+--- stderr: model_predictive_control
+CMake Error at /usr/share/cmake-3.22/Modules/FindPkgConfig.cmake:603 (message):
+  A required package was not found
+Call Stack (most recent call first):
+  /usr/share/cmake-3.22/Modules/FindPkgConfig.cmake:825 (_pkg_check_modules_internal)
+  CMakeLists.txt:14 (pkg_check_modules)
+
+
+---
+Failed   <<< model_predictive_control [1.49s, exited with code 1]
+Aborted  <<< racing_kart_sensor_kit_description [2.53s]
+Aborted  <<< racing_kart_description [2.58s]
+Aborted  <<< imu_gnss_poser [4.67s]
+Aborted  <<< path_to_trajectory [4.78s]
+Aborted  <<< simple_trajectory_generator [4.73s]
+Aborted  <<< goal_pose_setter [5.88s]
+Aborted  <<< imu_corrector [5.86s]
+Aborted  <<< simple_pure_pursuit [5.91s]
+Aborted  <<< racing_kart_gnss_poser [6.11s]
+Aborted  <<< gyro_odometer [6.31s]
+Aborted  <<< aichallenge_awsim_adapter [6.36s]
+Aborted  <<< cppad [7.18s]
+Aborted  <<< autoware_overlay_rviz_plugin [8.26s]
+
+Summary: 0 packages finished [8.70s]
+  1 package failed: model_predictive_control
+  13 packages aborted: aichallenge_awsim_adapter autoware_overlay_rviz_plugin cppad goal_pose_setter gyro_odometer imu_corrector imu_gnss_poser path_to_trajectory racing_kart_description racing_kart_gnss_poser racing_kart_sensor_kit_description simple_pure_pursuit simple_trajectory_generator
+  1 package had stderr output: model_predictive_control
+  2 packages not processed

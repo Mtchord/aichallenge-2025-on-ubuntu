@@ -1,0 +1,10 @@
+/aichallenge/build/simple_trajectory_generator/CMakeFiles/uninstall.dir
+/aichallenge/build/simple_trajectory_generator/CMakeFiles/simple_trajectory_generator_uninstall.dir
+/aichallenge/build/simple_trajectory_generator/CMakeFiles/simple_trajectory_generator_node.dir
+/aichallenge/build/simple_trajectory_generator/CMakeFiles/test.dir
+/aichallenge/build/simple_trajectory_generator/CMakeFiles/edit_cache.dir
+/aichallenge/build/simple_trajectory_generator/CMakeFiles/rebuild_cache.dir
+/aichallenge/build/simple_trajectory_generator/CMakeFiles/list_install_components.dir
+/aichallenge/build/simple_trajectory_generator/CMakeFiles/install.dir
+/aichallenge/build/simple_trajectory_generator/CMakeFiles/install/local.dir
+/aichallenge/build/simple_trajectory_generator/CMakeFiles/install/strip.dir

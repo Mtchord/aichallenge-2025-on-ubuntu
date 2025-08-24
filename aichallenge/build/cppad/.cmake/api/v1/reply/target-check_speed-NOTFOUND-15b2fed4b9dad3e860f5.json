@@ -1,0 +1,87 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"ADD_CUSTOM_TARGET"
+		],
+		"files" : 
+		[
+			"speed/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 38,
+				"parent" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"id" : "check_speed_cppad::@3ec1e556d5ca0fe19085"
+		},
+		{
+			"id" : "check_speed_double::@b124f3889d3778761c1d"
+		},
+		{
+			"id" : "check_speed_example::@5a9fe3f28ee9b543300c"
+		},
+		{
+			"id" : "check_speed_program::@5a9fe3f28ee9b543300c"
+		},
+		{
+			"id" : "check_speed_xpackage::@8fb6ac6d12d7a751a0f4"
+		},
+		{
+			"id" : "check_speed_cppad_jit::@a3c932c767624e8b1676"
+		}
+	],
+	"id" : "check_speed::@5fa1a19cef3f4020af16",
+	"name" : "check_speed",
+	"paths" : 
+	{
+		"build" : "speed",
+		"source" : "speed"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/speed/CMakeFiles/check_speed",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/speed/CMakeFiles/check_speed.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

@@ -1,0 +1,87 @@
+{
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"ADD_CUSTOM_TARGET",
+			"add_check_executable"
+		],
+		"files" : 
+		[
+			"cmake/add_check_executable.cmake",
+			"test_more/deprecated/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 40,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 75,
+				"parent" : 1
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "test_more_deprecated::@1cbd4d9f897601bee618"
+		},
+		{
+			"id" : "check_test_more_deprecated_atomic_two::@660bbe8c63cdb134b1f9"
+		},
+		{
+			"id" : "check_test_more_deprecated_chkpoint_one::@5c31bb3f5bb178a0687b"
+		}
+	],
+	"id" : "check_test_more_deprecated::@1cbd4d9f897601bee618",
+	"name" : "check_test_more_deprecated",
+	"paths" : 
+	{
+		"build" : "test_more/deprecated",
+		"source" : "test_more/deprecated"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/test_more/deprecated/CMakeFiles/check_test_more_deprecated",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/test_more/deprecated/CMakeFiles/check_test_more_deprecated.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

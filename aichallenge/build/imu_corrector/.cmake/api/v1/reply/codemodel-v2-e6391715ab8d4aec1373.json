@@ -1,0 +1,88 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-041e727a17003f419dbd.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"name" : "",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "imu_corrector",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "imu_corrector::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-imu_corrector-5b6fb78c89b5a8472e4f.json",
+					"name" : "imu_corrector",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "imu_corrector_node::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-imu_corrector_node-60567a35685cbf618217.json",
+					"name" : "imu_corrector_node",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "imu_corrector_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-imu_corrector_uninstall-9db8aca30fb2a8e63faa.json",
+					"name" : "imu_corrector_uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-3e117f356142184f20c6.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/aichallenge/build/imu_corrector",
+		"source" : "/aichallenge/workspace/src/aichallenge_submit/imu_corrector"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

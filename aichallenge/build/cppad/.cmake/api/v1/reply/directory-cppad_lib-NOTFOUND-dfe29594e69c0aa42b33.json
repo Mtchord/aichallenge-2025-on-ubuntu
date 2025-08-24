@@ -1,0 +1,59 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"INSTALL"
+		],
+		"files" : 
+		[
+			"cppad_lib/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 71,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "/aichallenge/install/cppad/lib",
+			"paths" : 
+			[
+				"cppad_lib/libcppad_lib.so.2409"
+			],
+			"targetId" : "cppad_lib::@4ee48d8410b8b935f246",
+			"targetIndex" : 44,
+			"targetInstallNamelink" : "skip",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "/aichallenge/install/cppad/lib",
+			"paths" : 
+			[
+				"cppad_lib/libcppad_lib.so"
+			],
+			"targetId" : "cppad_lib::@4ee48d8410b8b935f246",
+			"targetIndex" : 44,
+			"targetInstallNamelink" : "only",
+			"type" : "target"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "cppad_lib",
+		"source" : "cppad_lib"
+	}
+}

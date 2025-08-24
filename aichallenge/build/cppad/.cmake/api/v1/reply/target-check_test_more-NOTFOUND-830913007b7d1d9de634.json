@@ -1,0 +1,84 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"ADD_CUSTOM_TARGET"
+		],
+		"files" : 
+		[
+			"test_more/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 36,
+				"parent" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"id" : "check_test_more_deprecated::@1cbd4d9f897601bee618"
+		},
+		{
+			"id" : "check_test_more_compare_c::@aa2556f61c8c848d500a"
+		},
+		{
+			"id" : "check_test_more_debug_rel::@1d221ebe7878ea4c3118"
+		},
+		{
+			"id" : "check_test_more_cppad_for_tmb::@0a735f1264162c793de5"
+		},
+		{
+			"id" : "check_test_more_general::@afc4288d5c877889d09e"
+		}
+	],
+	"id" : "check_test_more::@005ed9c16944fd00451b",
+	"name" : "check_test_more",
+	"paths" : 
+	{
+		"build" : "test_more",
+		"source" : "test_more"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/test_more/CMakeFiles/check_test_more",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/test_more/CMakeFiles/check_test_more.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

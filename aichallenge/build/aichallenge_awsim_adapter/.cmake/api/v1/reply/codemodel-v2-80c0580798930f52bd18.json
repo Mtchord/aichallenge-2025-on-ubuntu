@@ -1,0 +1,88 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-eed44389b657503b3590.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"name" : "",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "aichallenge_awsim_adapter",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "actuation_cmd_converter::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-actuation_cmd_converter-d0db7a5a59bd911b3117.json",
+					"name" : "actuation_cmd_converter",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "aichallenge_awsim_adapter::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-aichallenge_awsim_adapter-c44ffc8a3daa91a13ad8.json",
+					"name" : "aichallenge_awsim_adapter",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "aichallenge_awsim_adapter_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-aichallenge_awsim_adapter_uninstall-f1ddea8b5218877dfb68.json",
+					"name" : "aichallenge_awsim_adapter_uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-3537185103580c28cc55.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/aichallenge/build/aichallenge_awsim_adapter",
+		"source" : "/aichallenge/workspace/src/aichallenge_system/aichallenge_awsim_adapter"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

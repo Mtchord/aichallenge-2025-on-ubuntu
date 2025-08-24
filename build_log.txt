@@ -1,0 +1,53 @@
+Starting >>> goal_pose_setter
+Starting >>> gyro_odometer
+Starting >>> imu_corrector
+Starting >>> imu_gnss_poser
+Starting >>> path_to_trajectory
+Starting >>> racing_kart_description
+Starting >>> racing_kart_sensor_kit_description
+Starting >>> simple_pure_pursuit
+Starting >>> aichallenge_awsim_adapter
+Starting >>> autoware_overlay_rviz_plugin
+Starting >>> cppad
+Starting >>> model_predictive_control
+Starting >>> racing_kart_gnss_poser
+Starting >>> simple_trajectory_generator
+--- stderr: goal_pose_setter
+CMake Error at CMakeLists.txt:9 (find_package):
+  By not providing "Findament_cmake_auto.cmake" in CMAKE_MODULE_PATH this
+  project has asked CMake to find a package configuration file provided by
+  "ament_cmake_auto", but CMake did not find one.
+
+  Could not find a package configuration file provided by "ament_cmake_auto"
+  with any of the following names:
+
+    ament_cmake_autoConfig.cmake
+    ament_cmake_auto-config.cmake
+
+  Add the installation prefix of "ament_cmake_auto" to CMAKE_PREFIX_PATH or
+  set "ament_cmake_auto_DIR" to a directory containing one of the above
+  files.  If "ament_cmake_auto" provides a separate development package or
+  SDK, be sure it has been installed.
+
+
+---
+Failed   <<< goal_pose_setter [1.39s, exited with code 1]
+Aborted  <<< imu_corrector [1.37s]
+Aborted  <<< simple_pure_pursuit [1.31s]
+Aborted  <<< aichallenge_awsim_adapter [1.30s]
+Aborted  <<< racing_kart_description [1.34s]
+Aborted  <<< gyro_odometer [1.38s]
+Aborted  <<< simple_trajectory_generator [1.24s]
+Aborted  <<< autoware_overlay_rviz_plugin [1.29s]
+Aborted  <<< racing_kart_gnss_poser [1.25s]
+Aborted  <<< path_to_trajectory [1.35s]
+Aborted  <<< racing_kart_sensor_kit_description [1.33s]
+Aborted  <<< imu_gnss_poser [1.36s]
+Aborted  <<< model_predictive_control [1.27s]
+Aborted  <<< cppad [2.80s]
+
+Summary: 0 packages finished [3.45s]
+  1 package failed: goal_pose_setter
+  13 packages aborted: aichallenge_awsim_adapter autoware_overlay_rviz_plugin cppad gyro_odometer imu_corrector imu_gnss_poser model_predictive_control path_to_trajectory racing_kart_description racing_kart_gnss_poser racing_kart_sensor_kit_description simple_pure_pursuit simple_trajectory_generator
+  13 packages had stderr output: aichallenge_awsim_adapter autoware_overlay_rviz_plugin goal_pose_setter gyro_odometer imu_corrector imu_gnss_poser model_predictive_control path_to_trajectory racing_kart_description racing_kart_gnss_poser racing_kart_sensor_kit_description simple_pure_pursuit simple_trajectory_generator
+  2 packages not processed

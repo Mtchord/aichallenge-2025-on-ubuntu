@@ -1,0 +1,1 @@
+/usr/bin/g++ CMakeFiles/test_more_debug_rel.dir/debug_rel.cpp.o CMakeFiles/test_more_debug_rel.dir/debug.cpp.o CMakeFiles/test_more_debug_rel.dir/release.cpp.o -o test_more_debug_rel   -L/home/genki-yamamoto/aichallenge-2025/build/cppad/cppad_lib 

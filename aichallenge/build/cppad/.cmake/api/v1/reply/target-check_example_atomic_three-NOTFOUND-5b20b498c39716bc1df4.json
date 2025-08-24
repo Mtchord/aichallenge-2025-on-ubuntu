@@ -1,0 +1,81 @@
+{
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"ADD_CUSTOM_TARGET",
+			"add_check_executable"
+		],
+		"files" : 
+		[
+			"cmake/add_check_executable.cmake",
+			"example/atomic_three/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 35,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 75,
+				"parent" : 1
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "example_atomic_three::@02edf90c6c13e9c3d215"
+		}
+	],
+	"id" : "check_example_atomic_three::@02edf90c6c13e9c3d215",
+	"name" : "check_example_atomic_three",
+	"paths" : 
+	{
+		"build" : "example/atomic_three",
+		"source" : "example/atomic_three"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/example/atomic_three/CMakeFiles/check_example_atomic_three",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/example/atomic_three/CMakeFiles/check_example_atomic_three.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

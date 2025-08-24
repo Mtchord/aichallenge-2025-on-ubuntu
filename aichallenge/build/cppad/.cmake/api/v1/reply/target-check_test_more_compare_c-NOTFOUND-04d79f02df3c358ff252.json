@@ -1,0 +1,75 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"ADD_CUSTOM_TARGET"
+		],
+		"files" : 
+		[
+			"test_more/compare_c/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 55,
+				"parent" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"id" : "check_test_more_compare_c_c::@d99baf0eafc20547667e"
+		},
+		{
+			"id" : "check_test_more_compare_c_cpp::@27f29f467beced8eb91e"
+		}
+	],
+	"id" : "check_test_more_compare_c::@aa2556f61c8c848d500a",
+	"name" : "check_test_more_compare_c",
+	"paths" : 
+	{
+		"build" : "test_more/compare_c",
+		"source" : "test_more/compare_c"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/test_more/compare_c/CMakeFiles/check_test_more_compare_c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/test_more/compare_c/CMakeFiles/check_test_more_compare_c.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

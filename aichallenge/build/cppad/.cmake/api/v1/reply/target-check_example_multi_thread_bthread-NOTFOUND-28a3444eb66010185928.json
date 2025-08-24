@@ -1,0 +1,81 @@
+{
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"ADD_CUSTOM_TARGET",
+			"add_check_executable"
+		],
+		"files" : 
+		[
+			"cmake/add_check_executable.cmake",
+			"example/multi_thread/bthread/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 40,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 75,
+				"parent" : 1
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "example_multi_thread_bthread::@abe6b0465c6e3290b229"
+		}
+	],
+	"id" : "check_example_multi_thread_bthread::@abe6b0465c6e3290b229",
+	"name" : "check_example_multi_thread_bthread",
+	"paths" : 
+	{
+		"build" : "example/multi_thread/bthread",
+		"source" : "example/multi_thread/bthread"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/example/multi_thread/bthread/CMakeFiles/check_example_multi_thread_bthread",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/example/multi_thread/bthread/CMakeFiles/check_example_multi_thread_bthread.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

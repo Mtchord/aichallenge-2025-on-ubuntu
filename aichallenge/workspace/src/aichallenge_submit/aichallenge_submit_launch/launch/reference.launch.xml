@@ -140,6 +140,8 @@
     <remap from="input/kinematics" to="/localization/kinematic_state"/>
     <remap from="input/trajectory" to="/planning/scenario_planning/trajectory"/>
     <remap from="output/control_cmd" to="/control/command/control_cmd"/>
+
+    <env name="LD_LIBRARY_PATH" value="$(env LD_LIBRARY_PATH):/aichallenge/workspace/src/aichallenge_submit"/>
   </node>
 
   <!-- Map -->

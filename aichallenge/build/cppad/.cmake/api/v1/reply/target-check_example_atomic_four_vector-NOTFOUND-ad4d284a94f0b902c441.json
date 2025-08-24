@@ -1,0 +1,81 @@
+{
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"ADD_CUSTOM_TARGET",
+			"add_check_executable"
+		],
+		"files" : 
+		[
+			"cmake/add_check_executable.cmake",
+			"example/atomic_four/vector/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 31,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 75,
+				"parent" : 1
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "example_atomic_four_vector::@a724e679c98a7cef2a0a"
+		}
+	],
+	"id" : "check_example_atomic_four_vector::@a724e679c98a7cef2a0a",
+	"name" : "check_example_atomic_four_vector",
+	"paths" : 
+	{
+		"build" : "example/atomic_four/vector",
+		"source" : "example/atomic_four/vector"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/example/atomic_four/vector/CMakeFiles/check_example_atomic_four_vector",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/example/atomic_four/vector/CMakeFiles/check_example_atomic_four_vector.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

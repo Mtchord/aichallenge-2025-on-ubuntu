@@ -1,0 +1,120 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"ADD_CUSTOM_TARGET"
+		],
+		"files" : 
+		[
+			"example/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 48,
+				"parent" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"id" : "check_example_abs_normal::@2f4aa5f8fe6b6fa22a99"
+		},
+		{
+			"id" : "check_example_atomic_four::@72ff26f88c54e705629a"
+		},
+		{
+			"id" : "check_example_atomic_three::@02edf90c6c13e9c3d215"
+		},
+		{
+			"id" : "check_example_atomic_two::@e7fa23cc4f1530e65059"
+		},
+		{
+			"id" : "check_example_chkpoint_two::@8d7a01568cd4c3a00e85"
+		},
+		{
+			"id" : "check_example_compare_change::@692d7082ef4052fd5550"
+		},
+		{
+			"id" : "check_example_general::@9f6a9f30e13e1ca67693"
+		},
+		{
+			"id" : "check_example_get_started::@62c4ae85194a891d07fc"
+		},
+		{
+			"id" : "check_example_graph::@746c37334a3a6be86fc8"
+		},
+		{
+			"id" : "check_example_json::@64e189f8894ba37e324f"
+		},
+		{
+			"id" : "check_example_multi_thread::@c056abbd9d4e3d9ba134"
+		},
+		{
+			"id" : "check_example_optimize::@36bbc0a49c3bdc64f89d"
+		},
+		{
+			"id" : "check_example_print_for::@cc28a9de95f7eca7d57a"
+		},
+		{
+			"id" : "check_example_sparse::@b1fb1899dbbc72631291"
+		},
+		{
+			"id" : "check_example_utility::@616ed4f2d3bbb5773aa2"
+		},
+		{
+			"id" : "check_example_valvector::@53c8eed841d4c7e223e2"
+		},
+		{
+			"id" : "check_example_jit::@bad8163d1354b2a39e83"
+		}
+	],
+	"id" : "check_example::@70983d692f648185febe",
+	"name" : "check_example",
+	"paths" : 
+	{
+		"build" : "example",
+		"source" : "example"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/example/CMakeFiles/check_example",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "/aichallenge/build/cppad/example/CMakeFiles/check_example.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}
