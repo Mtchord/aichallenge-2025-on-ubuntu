@@ -69,7 +69,7 @@ class FG_eval {
     }
 
     for (size_t i = 0; i < N - 1; i++) {
-      fg[0] += 40000 * CppAD::pow(vars[delta_start + i], 2);
+      fg[0] += 50000 * CppAD::pow(vars[delta_start + i], 2);
       fg[0] += 0.1 * CppAD::pow(vars[a_start + i], 2);
     }
 
