@@ -25,7 +25,7 @@ const double Lf = 1.032; // distance between the front and rear axles of the veh
 double ref_cte = 0;
 double ref_epsi = 0;
 //目標スピードを100.0MPHに設定
-double ref_v = 15.0;
+double ref_v = 30.0;
 
 /*
 0~N-1まではxの値
@@ -64,19 +64,19 @@ class FG_eval {
 
     for (size_t i = 0; i < N - 1; i++) {
       fg[0] += 500 * CppAD::pow(vars[cte_start + i] - ref_cte, 2);
-      fg[0] += 800 * CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
-      fg[0] += 100 * CppAD::pow(vars[v_start + i] - ref_v, 2);
+      fg[0] += 1000 * CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
+      fg[0] += 300 * CppAD::pow(vars[v_start + i] - ref_v, 2);
     }
 
     for (size_t i = 0; i < N - 1; i++) {
-      fg[0] += 50000 * CppAD::pow(vars[delta_start + i], 2);
+      fg[0] += 45000 * CppAD::pow(vars[delta_start + i], 2);
       fg[0] += 0.1 * CppAD::pow(vars[a_start + i], 2);
     }
 
     // Minimize the value gap between sequential actuations.
     for (size_t i = 0; i < N - 2; i++) {
-      fg[0] += 50 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
-      fg[0] += 10 * CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
+      fg[0] += 30 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
+      fg[0] += 50 * CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
     }
 
     //Setup constraints
@@ -418,6 +418,51 @@ void ModelPredictiveControl::onTimer()
           break;
       }
 
+      // 以下、もとのソースコード
+      // calc longitudinal speed and acceleration
+      double target_longitudinal_vel =
+        use_external_target_vel_ ? external_target_vel_ : closet_traj_point.longitudinal_velocity_mps;
+      double current_longitudinal_vel = odometry_->twist.twist.linear.x;
+
+      cmd.longitudinal.speed = target_longitudinal_vel;
+      cmd.longitudinal.acceleration =
+        speed_proportional_gain_ * (target_longitudinal_vel - current_longitudinal_vel);
+
+      // calc lateral control
+      //// calc lookahead distance
+      double lookahead_distance = lookahead_gain_ * target_longitudinal_vel + lookahead_min_distance_;
+      //// calc center coordinate of rear wheel
+      double rear_x = odometry_->pose.pose.position.x -
+                      wheel_base_ / 2.0 * std::cos(odometry_->pose.pose.orientation.z);
+      double rear_y = odometry_->pose.pose.position.y -
+                      wheel_base_ / 2.0 * std::sin(odometry_->pose.pose.orientation.z);
+      //// search lookahead point
+      auto lookahead_point_itr = std::find_if(
+        trajectory_->points.begin() + closet_traj_point_idx, trajectory_->points.end(),
+        [&](const TrajectoryPoint & point) {
+          return std::hypot(point.pose.position.x - rear_x, point.pose.position.y - rear_y) >=
+                lookahead_distance;
+        });
+      if (lookahead_point_itr == trajectory_->points.end()) {
+        lookahead_point_itr = trajectory_->points.end() - 1;
+      }
+      double lookahead_point_x = lookahead_point_itr->pose.position.x;
+      double lookahead_point_y = lookahead_point_itr->pose.position.y;
+
+      geometry_msgs::msg::PointStamped lookahead_point_msg;
+      lookahead_point_msg.header.stamp = get_clock()->now();
+      lookahead_point_msg.header.frame_id = "map";
+      lookahead_point_msg.point.x = lookahead_point_x;
+      lookahead_point_msg.point.y = lookahead_point_y;
+      lookahead_point_msg.point.z = closet_traj_point.pose.position.z;
+      pub_lookahead_point_->publish(lookahead_point_msg);
+
+      // calc steering angle for lateral control
+      double alpha = std::atan2(lookahead_point_y - rear_y, lookahead_point_x - rear_x) -
+                     tf2::getYaw(odometry_->pose.pose.orientation);
+      cmd.lateral.steering_tire_angle =
+        steering_tire_angle_gain_ * std::atan2(2.0 * wheel_base_ * std::sin(alpha), lookahead_distance);
+
       RCLCPP_ERROR(get_logger(), "MPC solve failed: status = %s (%d)", status_str, static_cast<int>(solution.status));
       pub_cmd_->publish(cmd);
       return;
@@ -440,50 +485,50 @@ void ModelPredictiveControl::onTimer()
     // return result;
 
 
-    // 以下、もとのソースコード
-    // calc longitudinal speed and acceleration
-    double target_longitudinal_vel =
-      use_external_target_vel_ ? external_target_vel_ : closet_traj_point.longitudinal_velocity_mps;
-    // double current_longitudinal_vel = odometry_->twist.twist.linear.x;
+    // // 以下、もとのソースコード
+    // // calc longitudinal speed and acceleration
+    // double target_longitudinal_vel =
+    //   use_external_target_vel_ ? external_target_vel_ : closet_traj_point.longitudinal_velocity_mps;
+    // // double current_longitudinal_vel = odometry_->twist.twist.linear.x;
 
-    // cmd.longitudinal.speed = target_longitudinal_vel;
-    // cmd.longitudinal.acceleration =
-    //   speed_proportional_gain_ * (target_longitudinal_vel - current_longitudinal_vel);
+    // // cmd.longitudinal.speed = target_longitudinal_vel;
+    // // cmd.longitudinal.acceleration =
+    // //   speed_proportional_gain_ * (target_longitudinal_vel - current_longitudinal_vel);
 
-    // calc lateral control
-    //// calc lookahead distance
-    double lookahead_distance = lookahead_gain_ * target_longitudinal_vel + lookahead_min_distance_;
-    //// calc center coordinate of rear wheel
-    double rear_x = odometry_->pose.pose.position.x -
-                    wheel_base_ / 2.0 * std::cos(odometry_->pose.pose.orientation.z);
-    double rear_y = odometry_->pose.pose.position.y -
-                    wheel_base_ / 2.0 * std::sin(odometry_->pose.pose.orientation.z);
-    //// search lookahead point
-    auto lookahead_point_itr = std::find_if(
-      trajectory_->points.begin() + closet_traj_point_idx, trajectory_->points.end(),
-      [&](const TrajectoryPoint & point) {
-        return std::hypot(point.pose.position.x - rear_x, point.pose.position.y - rear_y) >=
-               lookahead_distance;
-      });
-    if (lookahead_point_itr == trajectory_->points.end()) {
-      lookahead_point_itr = trajectory_->points.end() - 1;
-    }
-    double lookahead_point_x = lookahead_point_itr->pose.position.x;
-    double lookahead_point_y = lookahead_point_itr->pose.position.y;
+    // // calc lateral control
+    // //// calc lookahead distance
+    // double lookahead_distance = lookahead_gain_ * target_longitudinal_vel + lookahead_min_distance_;
+    // //// calc center coordinate of rear wheel
+    // double rear_x = odometry_->pose.pose.position.x -
+    //                 wheel_base_ / 2.0 * std::cos(odometry_->pose.pose.orientation.z);
+    // double rear_y = odometry_->pose.pose.position.y -
+    //                 wheel_base_ / 2.0 * std::sin(odometry_->pose.pose.orientation.z);
+    // //// search lookahead point
+    // auto lookahead_point_itr = std::find_if(
+    //   trajectory_->points.begin() + closet_traj_point_idx, trajectory_->points.end(),
+    //   [&](const TrajectoryPoint & point) {
+    //     return std::hypot(point.pose.position.x - rear_x, point.pose.position.y - rear_y) >=
+    //            lookahead_distance;
+    //   });
+    // if (lookahead_point_itr == trajectory_->points.end()) {
+    //   lookahead_point_itr = trajectory_->points.end() - 1;
+    // }
+    // double lookahead_point_x = lookahead_point_itr->pose.position.x;
+    // double lookahead_point_y = lookahead_point_itr->pose.position.y;
 
-    geometry_msgs::msg::PointStamped lookahead_point_msg;
-    lookahead_point_msg.header.stamp = get_clock()->now();
-    lookahead_point_msg.header.frame_id = "map";
-    lookahead_point_msg.point.x = lookahead_point_x;
-    lookahead_point_msg.point.y = lookahead_point_y;
-    lookahead_point_msg.point.z = closet_traj_point.pose.position.z;
-    pub_lookahead_point_->publish(lookahead_point_msg);
+    // geometry_msgs::msg::PointStamped lookahead_point_msg;
+    // lookahead_point_msg.header.stamp = get_clock()->now();
+    // lookahead_point_msg.header.frame_id = "map";
+    // lookahead_point_msg.point.x = lookahead_point_x;
+    // lookahead_point_msg.point.y = lookahead_point_y;
+    // lookahead_point_msg.point.z = closet_traj_point.pose.position.z;
+    // pub_lookahead_point_->publish(lookahead_point_msg);
 
-    // calc steering angle for lateral control
-    // double alpha = std::atan2(lookahead_point_y - rear_y, lookahead_point_x - rear_x) -
-    //                tf2::getYaw(odometry_->pose.pose.orientation);
-    // cmd.lateral.steering_tire_angle =
-    //   steering_tire_angle_gain_ * std::atan2(2.0 * wheel_base_ * std::sin(alpha), lookahead_distance);
+    // // calc steering angle for lateral control
+    // // double alpha = std::atan2(lookahead_point_y - rear_y, lookahead_point_x - rear_x) -
+    // //                tf2::getYaw(odometry_->pose.pose.orientation);
+    // // cmd.lateral.steering_tire_angle =
+    // //   steering_tire_angle_gain_ * std::atan2(2.0 * wheel_base_ * std::sin(alpha), lookahead_distance);
   }
   pub_cmd_->publish(cmd);
   // cmd.lateral.steering_tire_angle /=  steering_tire_angle_gain_;
