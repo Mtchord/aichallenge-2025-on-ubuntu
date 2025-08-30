@@ -210,6 +210,19 @@ void ModelPredictiveControl::onTimer()
     return;
   }
 
+  if (!trajectory_) {
+    RCLCPP_WARN_THROTTLE(
+      get_logger(), *get_clock(), 5000 /*ms*/,
+      "No trajectory received yet. Skipping control.");
+    return;
+  }
+  if (trajectory_->points.empty()) {
+    RCLCPP_WARN_THROTTLE(
+      get_logger(), *get_clock(), 5000 /*ms*/,
+      "Received empty trajectory. Skipping control.");
+    return;
+  }
+
   size_t closet_traj_point_idx =
     findNearestIndex(trajectory_->points, odometry_->pose.pose.position);
 
